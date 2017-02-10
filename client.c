@@ -1,12 +1,25 @@
-#include "stdio.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+
+void capitalizeStr(char *messageString)
+{
+	// create a string that is big enough to hold the message to send to the server 
+    char *message = malloc(strlen(messageString)+5);
+    
+    // create the string to send the server.
+    strcpy(message, "CAP\n");
+    strcat(message, messageString);
+    strcat(message, "\n");
+    printf("%s",message);
+}
 
 int main() 
 {
 	// action that the user wants to perform
    char inputAction;
    //string that the user wants capitalized
-   char userString[50]
+   char userString[50];
    
    //keep looping until the user decides to quit the program
    while(inputAction != 'q') 
@@ -20,8 +33,9 @@ int main()
 
    	case 's':
 
-   	printf("Please enter a string to capitalize\n");
-   	scanf(" %s",&userString);
+   	printf("Please enter a string to capitalize: ");
+   	scanf(" %s",userString);
+   	capitalizeStr(userString);
    		break;
    	case 't':
    	    printf("You entered t\n");
@@ -31,16 +45,4 @@ int main()
 }
 
    return 0;
-}
-
-void capitalizeStr(char *userString)
-{
-	// create a string that is big enough to hold the message to send to the server 
-    char *message = malloc(strlen(userString)+5);
-    
-    // create the string to send the server.
-    strcpy(message, "CAP\n");
-    strcat(message, userString);
-    strcat(message, "\n");
-    printf("%s",message);
 }
