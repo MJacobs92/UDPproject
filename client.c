@@ -61,15 +61,15 @@ int main(int argc, char **argv)
 		switch(inputAction) {
 
 			case 's':
-			printf("Please enter a string to capitalize: ");
-			scanf(" %s",userString);
-			capitalizeStr(userString);
-			break;
+				printf("Please enter a string to capitalize: ");
+				scanf(" %s",userString);
+				capitalizeStr(userString);
+				break;
 			case 't':
-			printf("Please enter a file name to receive: ");
-			scanf(" %s",fileName);
-			receiveFile(fileName);
-			break;
+				printf("Please enter a file name to receive: ");
+				scanf(" %s",fileName);
+				receiveFile(fileName);
+				break;
 		}
 
 	}
