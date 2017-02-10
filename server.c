@@ -46,14 +46,14 @@ int main(int argc, char **argv)
     	char *token;
 
     	// get the first token which should be the action to perform (ie CAP or FILE)
-   		token = strtok(str, "\n");
+   		token = strtok(messageBuffer, "\n");
 
    		// loop through the other tokens 
 	   while( token != NULL ) 
 	   {
 	      printf( " %s\n", token );
 	    
-	      token = strtok(NULL, s);
+	      token = strtok(NULL, "\n");
 	   }
 	}
 
