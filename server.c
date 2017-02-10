@@ -5,6 +5,7 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <ctype.h>
 
 int main(int argc, char **argv) 
 {
@@ -48,13 +49,40 @@ int main(int argc, char **argv)
     	// get the first token which should be the action to perform (ie CAP or FILE)
    		token = strtok(messageBuffer, "\n");
 
-   		// loop through the other tokens 
-	   while( token != NULL ) 
-	   {
-	      printf( " %s\n", token );
-	    
-	      token = strtok(NULL, "\n");
-	   }
+   		if(strcmp(token,"CAP") == 0)
+   		{
+   			int count = 0;
+	   	   // loop through the other tokens 
+		   while( token != NULL ) 
+		   {
+		      printf( " %s\n", token);
+		      printf("%i\n",count );
+
+		      if(count == 1)
+		      {
+		      	printf("inside count\n");
+		      	for(int i=0;i<strlen(token);i++)
+		      	{
+      				token[i] = toupper(token[i]);
+      				
+		      	}
+		      	printf("%s - final\n", token);
+
+		      }
+		    
+		      token = strtok(NULL, "\n");
+		      count++;
+		   }
+   		}
+   		else if(strcmp(token,"FILE") == 0)
+   		{
+
+   		}
+   		else{
+   			printf("Bad Content\n");
+   		}
+
+   		
 	}
 
 	return 0;
