@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void capitalizeStr(char *messageString)
+char * constructMessageForCap(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
 	char *message = malloc(strlen(messageString)+5);
@@ -31,13 +31,13 @@ void receiveFile(char *messageString)
 int main(int argc, char **argv) 
 {
 	// read tcp port from command  line and store
-	char* tcpPort = argv[1];
+	int tcpPort = atoi(argv[1]);
 
 	// read server ip address from command line and store
 	char* serverIp = argv[2];
 
 	// read server udp port from command line and store
-	char* serverUDPPort = argv[3];
+	int serverUDPPort = atoi(argv[3]);
 
 	printf("tcp: %s\n ip: %s\n udp: %s\n", tcpPort, serverIp, serverUDPPort);
 
@@ -49,6 +49,24 @@ int main(int argc, char **argv)
 
 	//file name entered by user
 	char fileName[50];
+
+	// socket connection
+	int socketConn;
+
+	//Struct to hold server connection information
+	struct sockaddr_in servaddr;
+
+	socklen_t sendsize = sizeof(servaddr);
+
+	//ensure servaddr is clear
+	bzero( &servaddr, sizeof(servaddr));
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htons(serverIp);
+	servaddr.sin_port = htons(serverUDPPort);
+
+	//create socket to listen for connections. 
+    socketConn = socket(AF_INET, SOCK_DGRAM, 0);
 
 	//keep looping until the user decides to quit the program
 	while(inputAction != 'q') 
@@ -63,7 +81,8 @@ int main(int argc, char **argv)
 			case 's':
 				printf("Please enter a string to capitalize: ");
 				scanf(" %s",userString);
-				capitalizeStr(userString);
+				char* message = constructMessageForCap(userString);
+				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&serverAddr,sendsize);
 				break;
 			case 't':
 				printf("Please enter a file name to receive: ");
