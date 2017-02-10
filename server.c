@@ -42,6 +42,21 @@ int main(int argc, char **argv)
 
     	// read message from client.
     	int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize);
+
+    	char *token;
+
+    	// get the first token which should be the action to perform (ie CAP or FILE)
+   		token = strtok(str, "\n");
+
+   		// loop through the other tokens 
+	   while( token != NULL ) 
+	   {
+	      printf( " %s\n", token );
+	    
+	      token = strtok(NULL, s);
+	   }
 	}
+
+	return 0;
 
 }
