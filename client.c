@@ -5,27 +5,27 @@
 void capitalizeStr(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
-    char *message = malloc(strlen(messageString)+5);
-    
+	char *message = malloc(strlen(messageString)+5);
+
     // create the string to send the server.
-    strcpy(message, "CAP\n");
-    strcat(message, messageString);
-    strcat(message, "\n");
-    printf("%s",message);
+	strcpy(message, "CAP\n");
+	strcat(message, messageString);
+	strcat(message, "\n");
+	printf("%s",message);
 }
 
 void receiveFile(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
-    char *message = malloc(strlen(messageString)+11);
-    
+	char *message = malloc(strlen(messageString)+11);
+
     // create the string to send the server.
-    strcpy(message, "FILE\n");
-    strcat(message, messageString);
-    strcat(message, "\n");
-    strcat(message, tcpPort);
-    strcat(message, "\n");
-    printf("%s",message);
+	strcpy(message, "FILE\n");
+	strcat(message, messageString);
+	strcat(message, "\n");
+	strcat(message, tcpPort);
+	strcat(message, "\n");
+	printf("%s",message);
 }
 
 int main(int argc, char **argv) 
@@ -42,37 +42,37 @@ int main(int argc, char **argv)
 	printf("tcp: %s\n ip: %s\n udp: %s\n", tcpPort, serverIp, serverUDPPort);
 
 	// action that the user wants to perform
-   char inputAction;
-   
-   //string that the user wants capitalized
-   char userString[50];
+	char inputAction;
 
-   //file name entered by user
-   char fileName[50];
-   
-   //keep looping until the user decides to quit the program
-   while(inputAction != 'q') 
-   {
-   	printf("Here are your allowed commands:\n s - to enter string to capitalize.\n t - to get a file\n q - to quit\n Enter your command: ");
-   	
-   	scanf(" %c",&inputAction);
+	//string that the user wants capitalized
+	char userString[50];
 
-   	//choose an action to perform based on what the user input
-   switch(inputAction) {
+	//file name entered by user
+	char fileName[50];
 
-   	case 's':
-	   	printf("Please enter a string to capitalize: ");
-	   	scanf(" %s",userString);
-	   	capitalizeStr(userString);
-   		break;
-   	case 't':
-   	    printf("Please enter a file name to receive: ");
-	   	scanf(" %s",fileName);
-	   	receiveFile(fileName);
-   		break;
-   }
+	//keep looping until the user decides to quit the program
+	while(inputAction != 'q') 
+	{
+		printf("Here are your allowed commands:\n s - to enter string to capitalize.\n t - to get a file\n q - to quit\n Enter your command: ");
 
-}
+		scanf(" %c",&inputAction);
 
-   return 0;
+   	    //choose an action to perform based on what the user input
+		switch(inputAction) {
+
+			case 's':
+			printf("Please enter a string to capitalize: ");
+			scanf(" %s",userString);
+			capitalizeStr(userString);
+			break;
+			case 't':
+			printf("Please enter a file name to receive: ");
+			scanf(" %s",fileName);
+			receiveFile(fileName);
+			break;
+		}
+
+	}
+
+	return 0;
 }
