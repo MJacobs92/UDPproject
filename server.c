@@ -9,16 +9,39 @@
 int main(int argc, char **argv) 
 {
 	// read server udp port from command line and store
-	char* udpPort = argv[1];
-	printf("udp: %s\n", udpPort);
+	int udpPort = atoi(argv[1]);
+	printf("udp: %i\n", udpPort);
 
-	int socket;
+	char messageBuffer[1024];
 
+	// socket connection
+	int socketConn;
+
+	//Struct to hold server connection information
 	struct sockaddr_in servaddr;
+	struct sockaddr_storage sender;
+    socklen_t sendsize = sizeof(sender);
+
+	//ensure servaddr is clear
+	bzero( &servaddr, sizeof(servaddr));
 
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = htons(INADDR_ANY);
 	servaddr.sin_port = htons(udpPort);
 
-    socket = socket(PF_INET, SOCK_DGRAM, 0);
+	//create socket to listen for connections. 
+    socketConn = socket(AF_INET, SOCK_DGRAM, 0);
+
+    //Prepare to listen for connections from address/port specified - any ip address and from port specified as commandline argument.
+    bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
+
+    while(1){
+    	
+    	//clear previous client connection info
+    	bzero(&sender, sizeof(sender));
+
+    	// read message from client.
+    	int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize);
+	}
+
 }
