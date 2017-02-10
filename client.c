@@ -14,7 +14,7 @@ void capitalizeStr(char *messageString)
     printf("%s",message);
 }
 
-void recieveFile(char *messageString)
+void receiveFile(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
     char *message = malloc(strlen(messageString)+6);
@@ -26,8 +26,19 @@ void recieveFile(char *messageString)
     printf("%s",message);
 }
 
-int main() 
+int main(int argc, char **argv) 
 {
+	// read tcp port from command  line and store
+	char* tcpPort = argv[1];
+
+	// read server ip address from command line and store
+	char* serverIp = argv[2];
+
+	// read server udp port from command line and store
+	char* serverUDPPort = argv[3];
+
+	printf("tcp: %s\n ip: %s\n udp: %s\n", tcpPort, serverIp, serverUDPPort);
+
 	// action that the user wants to perform
    char inputAction;
    
@@ -53,9 +64,9 @@ int main()
 	   	capitalizeStr(userString);
    		break;
    	case 't':
-   	    printf("Please enter a file name to recieve: ");
+   	    printf("Please enter a file name to receive: ");
 	   	scanf(" %s",fileName);
-	   	recieveFile(fileName);
+	   	receiveFile(fileName);
    		break;
    }
 
