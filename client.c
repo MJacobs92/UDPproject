@@ -17,11 +17,13 @@ void capitalizeStr(char *messageString)
 void receiveFile(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
-    char *message = malloc(strlen(messageString)+6);
+    char *message = malloc(strlen(messageString)+11);
     
     // create the string to send the server.
     strcpy(message, "FILE\n");
     strcat(message, messageString);
+    strcat(message, "\n");
+    strcat(message, tcpPort);
     strcat(message, "\n");
     printf("%s",message);
 }
