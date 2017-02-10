@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-char * constructMessageForCap(char *messageString)
+char* constructMessageForCap(char *messageString)
 {
 	// create a string that is big enough to hold the message to send to the server 
 	char *message = malloc(strlen(messageString)+5);
@@ -12,9 +15,10 @@ char * constructMessageForCap(char *messageString)
 	strcat(message, messageString);
 	strcat(message, "\n");
 	printf("%s",message);
+	return message;
 }
 
-void receiveFile(char *messageString)
+void receiveFile(char *messageString, char *tcpPort)
 {
 	// create a string that is big enough to hold the message to send to the server 
 	char *message = malloc(strlen(messageString)+11);
@@ -31,7 +35,7 @@ void receiveFile(char *messageString)
 int main(int argc, char **argv) 
 {
 	// read tcp port from command  line and store
-	int tcpPort = atoi(argv[1]);
+	char* tcpPort = argv[1];
 
 	// read server ip address from command line and store
 	char* serverIp = argv[2];
@@ -39,7 +43,7 @@ int main(int argc, char **argv)
 	// read server udp port from command line and store
 	int serverUDPPort = atoi(argv[3]);
 
-	printf("tcp: %s\n ip: %s\n udp: %s\n", tcpPort, serverIp, serverUDPPort);
+	printf("tcp: %s\n ip: %s\n udp: %i\n", tcpPort, serverIp, serverUDPPort);
 
 	// action that the user wants to perform
 	char inputAction;
@@ -62,7 +66,7 @@ int main(int argc, char **argv)
 	bzero( &servaddr, sizeof(servaddr));
 
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htons(serverIp);
+	servaddr.sin_addr.s_addr = inet_addr(serverIp);
 	servaddr.sin_port = htons(serverUDPPort);
 
 	//create socket to listen for connections. 
@@ -82,12 +86,12 @@ int main(int argc, char **argv)
 				printf("Please enter a string to capitalize: ");
 				scanf(" %s",userString);
 				char* message = constructMessageForCap(userString);
-				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&serverAddr,sendsize);
+				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);
 				break;
 			case 't':
 				printf("Please enter a file name to receive: ");
 				scanf(" %s",fileName);
-				receiveFile(fileName);
+				receiveFile(fileName,tcpPort);
 				break;
 		}
 
