@@ -87,6 +87,17 @@ int main(int argc, char **argv)
 				scanf(" %s",userString);
 				char* message = constructMessageForCap(userString);
 				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);
+				char receivedMessage[1024];
+
+				while(1)
+				{
+					recvfrom(socketConn,receivedMessage,1024,0,NULL, NULL);
+					if(strcmp(receivedMessage,"") != 0)
+					{
+						printf("Message from server: %s",receivedMessage);
+						break;
+					}					
+				}
 				break;
 			case 't':
 				printf("Please enter a file name to receive: ");
