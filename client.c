@@ -14,7 +14,6 @@ char* constructMessageForCap(char *messageString)
 	strcpy(message, "CAP\n");
 	strcat(message, messageString);
 	strcat(message, "\n");
-	printf("%s",message);
 	return message;
 }
 
@@ -29,7 +28,6 @@ void receiveFile(char *messageString, char *tcpPort)
 	strcat(message, "\n");
 	strcat(message, tcpPort);
 	strcat(message, "\n");
-	printf("%s",message);
 }
 
 int main(int argc, char **argv) 
@@ -42,8 +40,6 @@ int main(int argc, char **argv)
 
 	// read server udp port from command line and store
 	int serverUDPPort = atoi(argv[3]);
-
-	printf("tcp: %s\n ip: %s\n udp: %i\n", tcpPort, serverIp, serverUDPPort);
 
 	// action that the user wants to perform
 	char inputAction;
@@ -77,14 +73,14 @@ int main(int argc, char **argv)
 	{
 		printf("Here are your allowed commands:\n s - to enter string to capitalize.\n t - to get a file\n q - to quit\n Enter your command: ");
 
-		scanf(" %c",&inputAction);
+		fgets(&inputAction,1024,stdin);
 
    	    //choose an action to perform based on what the user input
 		switch(inputAction) {
 
 			case 's':
 				printf("Please enter a string to capitalize: ");
-				scanf(" %s",userString);
+				fgets(userString,1024,stdin);
 				char* message = constructMessageForCap(userString);
 				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);
 				char receivedMessage[1024];
@@ -101,7 +97,7 @@ int main(int argc, char **argv)
 				break;
 			case 't':
 				printf("Please enter a file name to receive: ");
-				scanf(" %s",fileName);
+				fgets(fileName,1024,stdin);
 				receiveFile(fileName,tcpPort);
 				break;
 		}
