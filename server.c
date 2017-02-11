@@ -68,6 +68,12 @@ int main(int argc, char **argv)
 		      	}
 		      	printf("%s - final\n", token);
 
+		      	char *message = malloc(strlen(token)+5);
+		      	strcpy(message, token);
+				strcat(message, "\n");
+
+				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+
 		      }
 		    
 		      token = strtok(NULL, "\n");
