@@ -17,7 +17,7 @@ char* constructMessageForCap(char *messageString)
 	return message;
 }
 
-void receiveFile(char *messageString, char *tcpPort)
+char* constructMessageForReceiveFile(char *messageString, char *tcpPort)
 {
 	// create a string that is big enough to hold the message to send to the server 
 	char *message = malloc(strlen(messageString)+11);
@@ -98,7 +98,21 @@ int main(int argc, char **argv)
 			case 't':
 				printf("Please enter a file name to receive: ");
 				fgets(fileName,1024,stdin);
-				receiveFile(fileName,tcpPort);
+				char* message = constructMessageForReceiveFile(fileName,tcpPort);
+				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);
+
+				char receivedMessage[1024];
+
+				while(1)
+				{
+					recvfrom(socketConn,receivedMessage,1024,0,NULL, NULL);
+					if(strcmp(receivedMessage,"") != 0)
+					{
+						printf("Message from server: %s",receivedMessage);
+						break;
+					}					
+				}
+				
 				break;
 		}
 

@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	//Struct to hold server connection information
 	struct sockaddr_in servaddr;
 	struct sockaddr_storage sender;
-    socklen_t sendsize = sizeof(sender);
+	socklen_t sendsize = sizeof(sender);
 
 	//ensure servaddr is clear
 	bzero( &servaddr, sizeof(servaddr));
@@ -31,64 +31,92 @@ int main(int argc, char **argv)
 	servaddr.sin_port = htons(udpPort);
 
 	//create socket to listen for connections. 
-    socketConn = socket(AF_INET, SOCK_DGRAM, 0);
+	socketConn = socket(AF_INET, SOCK_DGRAM, 0);
 
     //Prepare to listen for connections from address/port specified - any ip address and from port specified as commandline argument.
-    bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
+	bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
-    while(1){
-    	
+	char *token;
+	int count = 0;
+
+	while(1){
+
     	//clear previous client connection info
-    	bzero(&sender, sizeof(sender));
+		bzero(&sender, sizeof(sender));
 
     	// read message from client.
-    	int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize);
+		int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize);
 
-    	char *token;
+		printf("Message RECEIVED from client: %s\n", messageBuffer);
+
 
     	// get the first token which should be the action to perform (ie CAP or FILE)
-   		token = strtok(messageBuffer, "\n");
+		token = strtok(messageBuffer, "\n");		
 
-   		if(strcmp(token,"CAP") == 0)
-   		{
-   			int count = 0;
+		if(strcmp(token,"CAP") == 0)
+		{
+
 	   	   // loop through the other tokens 
-		   while( token != NULL ) 
-		   {
-		      printf( " %s\n", token);
-		      printf("%i\n",count );
+			while( token != NULL ) 
+			{
+				if(count == 1)
+				{
+					for(int i=0;i<strlen(token);i++)
+					{
+						token[i] = toupper(token[i]);
 
-		      if(count == 1)
-		      {
-		      	printf("inside count\n");
-		      	for(int i=0;i<strlen(token);i++)
-		      	{
-      				token[i] = toupper(token[i]);
-      				
-		      	}
-		      	printf("%s - final\n", token);
+					}
+					printf("Message SENT to client: %s\n", token);
 
-		      	char *message = malloc(strlen(token)+5);
-		      	strcpy(message, token);
-				strcat(message, "\n");
+					char *message = malloc(strlen(token)+5);
+					strcpy(message, token);
+					strcat(message, "\n");
 
-				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
 
-		      }
-		    
-		      token = strtok(NULL, "\n");
-		      count++;
-		   }
-   		}
-   		else if(strcmp(token,"FILE") == 0)
-   		{
+				}
 
-   		}
-   		else{
-   			printf("Bad Content\n");
-   		}
+				token = strtok(NULL, "\n");
+				count++;
+			}
+		}
+		else if(strcmp(token,"FILE") == 0)
+		{
+			while( token != NULL ) 
+			{
+				if(count == 1)
+				{
+					FILE *fp;
+					fp = fopen(token,"r");
 
-   		
+					if( fp == NULL )
+					{
+						printf("File: %s was not found\n", token);
+
+					char *message = malloc(strlen("NOT FOUND")+5);
+					strcpy(message, "NOT FOUND");
+					strcat(message, "\n");
+
+					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+
+					}
+
+				}
+				else if(count == 2)
+				{
+					printf("Shouldnt be in here at the moment.\n");
+				}
+
+				token = strtok(NULL, "\n");
+				count++;
+			}
+
+		}
+		else{
+			printf("Bad Content\n");
+		}
+
+
 	}
 
 	return 0;
