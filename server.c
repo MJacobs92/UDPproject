@@ -9,16 +9,20 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
-void sendFileOverTCP(struct sockaddr_storage sender, char *tcpPort, char* fileContents)
+void sendFileOverTCP(char* ipString, char *tcpPort, char* fileContents)
 {
 	int socketConn;
-	struct sockaddr_in* servaddr;
+	struct sockaddr_in servaddr;
 	// char buffer[1024];
 
-	bzero(&servaddr,sizeof(servaddr));
-	servaddr = (struct sockaddr_in*)&sender;
+	// struct sockaddr* client = (struct sockaddr*)&sender;
 
-	servaddr->sin_port = htons(atoi(tcpPort));
+	bzero(&servaddr,sizeof(servaddr));
+	// servaddr = (struct sockaddr_in*)&sender;
+
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = inet_addr(ipString);
+	servaddr.sin_port = htons(atoi(tcpPort));
 
 	//create socket to listen for connections. 
 	socketConn = socket(AF_INET, SOCK_STREAM, 0);
@@ -28,13 +32,15 @@ void sendFileOverTCP(struct sockaddr_storage sender, char *tcpPort, char* fileCo
 	write(socketConn,fileContents,strlen(fileContents)+1);
 	printf("File content sent to client: %s", fileContents);
 	
+	// char* ipString = inet_ntoa(servaddr->sin_addr);
 
-
-	// inet_ntop(AF_INET,&servaddr,buffer,sizeof(buffer));
+	// inet_ntop(AF_INET,(struct sockaddr_in*)&sender,buffer,sizeof(buffer));
 
 	// printf("made it to the function\n");
 	// // printf("****** trying to extract ip: %u\n", servaddr.sin_addr.s_addr);
+	// printf("****** trying to extract ip: %s\n", ipString);
 	// printf("****** trying to extract ip: %s\n", buffer);
+	// printf("****** port to use: %i\n", servaddr->sin_port);
 
 
 
@@ -77,6 +83,7 @@ int main(int argc, char **argv)
 	bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
 	char *token;
+	char *ipString;
 	int count = 0;
 	// char *message = malloc(1);
 	char message[1024];
@@ -90,9 +97,13 @@ int main(int argc, char **argv)
 		bzero(&sender, sizeof(sender));
 
     	// read message from client.
-		int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize);
+		int messageLength = recvfrom(socketConn, messageBuffer, sizeof(messageBuffer), 0, (struct sockaddr*)&sender, &sendsize); 
+		
+		struct sockaddr_in* clientAddr;
+		clientAddr = (struct sockaddr_in*)&sender;
+		ipString = inet_ntoa(clientAddr->sin_addr);
 
-		printf("Message RECEIVED from client: %s\n", messageBuffer);
+		printf("Message RECEIVED from client (%s): %s\n", ipString,messageBuffer);
 
 
     	// get the first token which should be the action to perform (ie CAP or FILE)
@@ -181,7 +192,7 @@ int main(int argc, char **argv)
 				else if(count == 2)
 				{
 					printf("Made it to count 2.\n");
-					sendFileOverTCP(sender,token,fileContents);
+					sendFileOverTCP(ipString,token,fileContents);
 				}
 
 				token = strtok(NULL, "\n");

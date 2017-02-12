@@ -59,7 +59,16 @@ void receiveFile(char * tcpPort, char* fileName)
 
     bzero(fileContents, sizeof(fileContents));
 
-    read(acceptedConnection,fileContents,sizeof(fileContents));
+    while(1)
+    {
+    	read(acceptedConnection,fileContents,sizeof(fileContents));
+    	if(strcmp(fileContents,"") != 0)
+		{
+			// printf("Message from server: %s",receivedMessage);
+			break;
+		}		
+    }
+    
 
     FILE *file = fopen(fileName, "wb");
 	fwrite(fileContents, sizeof(char), sizeof(fileContents), file);
