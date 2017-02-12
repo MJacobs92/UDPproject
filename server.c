@@ -32,25 +32,6 @@ void sendFileOverTCP(char* ipString, char *tcpPort, char* fileContents)
 	write(socketConn,fileContents,strlen(fileContents));
 	printf("File content sent to client: %s", fileContents);
 	
-	// char* ipString = inet_ntoa(servaddr->sin_addr);
-
-	// inet_ntop(AF_INET,(struct sockaddr_in*)&sender,buffer,sizeof(buffer));
-
-	// printf("made it to the function\n");
-	// // printf("****** trying to extract ip: %u\n", servaddr.sin_addr.s_addr);
-	// printf("****** trying to extract ip: %s\n", ipString);
-	// printf("****** trying to extract ip: %s\n", buffer);
-	// printf("****** port to use: %i\n", servaddr->sin_port);
-
-
-
-	// socklen_t peer_addrlen;
-	// char host[NI_MAXHOST];
-
-	// getnameinfo((struct sockaddr *)&sender, sizeof(sender), host, sizeof(host), NULL, 0, NI_NUMERICHOST);
-
-	// printf("******source ip of client! %s\n", host);
-
 }
 
 int main(int argc, char **argv) 
@@ -191,7 +172,6 @@ int main(int argc, char **argv)
 				}
 				else if(count == 2)
 				{
-					printf("Made it to count 2.\n");
 					sendFileOverTCP(ipString,token,fileContents);
 				}
 

@@ -43,6 +43,7 @@ void receiveFile(char * tcpPort, char* fileName, char* fileSize)
 
 	char fileContents[atoi(fileSize)];
 
+	// setup tcp socket
 	socketConn = socket(AF_INET, SOCK_STREAM, 0);
 
 	bzero( &servaddr, sizeof(servaddr));
@@ -53,23 +54,27 @@ void receiveFile(char * tcpPort, char* fileName, char* fileSize)
 
     bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
 
+    //listen for tcp connections. up to 10 connections at a time.
     listen(socketConn, 10);
 
+    // accept connections. if there arent any, wait.
     acceptedConnection = accept(socketConn, (struct sockaddr*) NULL, NULL);
 
+    //ensure fileContents is empty.
     bzero(fileContents, sizeof(fileContents));
 
     while(1)
     {
+    	//read data from connection and exit loop once written
     	read(acceptedConnection,fileContents,sizeof(fileContents));
     	if(strcmp(fileContents,"") != 0)
 		{
-			// printf("Message from server: %s",receivedMessage);
 			break;
 		}		
     }
     
-
+    //remove \r and \n from file name and write contents to file.
+    fileName[strcspn(fileName, "\r\n")] = 0;
     FILE *file = fopen(fileName, "wb");
 	fwrite(fileContents, sizeof(char), sizeof(fileContents), file);
 	fclose(file);
@@ -92,7 +97,6 @@ char* getFileSize(char * input)
 		token = strtok(NULL, "\n");
 		count++;
 	}
-	printf("************* %s\n", result );
 
 	return result;
 }
