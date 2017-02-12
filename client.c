@@ -35,13 +35,13 @@ char* getUDPMessageFromServer(char *receivedMessage, int socketConn)
 
 }
 
-void receiveFile(char * tcpPort, char* fileName)
+void receiveFile(char * tcpPort, char* fileName, char* fileSize)
 {
 	int socketConn;
 	int acceptedConnection;
 	struct sockaddr_in servaddr;
 
-	char fileContents[1024];
+	char fileContents[atoi(fileSize)];
 
 	socketConn = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -74,6 +74,27 @@ void receiveFile(char * tcpPort, char* fileName)
 	fwrite(fileContents, sizeof(char), sizeof(fileContents), file);
 	fclose(file);
 
+}
+
+char* getFileSize(char * input)
+{
+	char *token;
+	char *result;
+	int count = 0;
+	token = strtok(input, "\n");
+	while( token != NULL ) 
+	{
+		if(count == 1)
+		{
+			result = token;
+
+		}
+		token = strtok(NULL, "\n");
+		count++;
+	}
+	printf("************* %s\n", result );
+
+	return result;
 }
 
 int main(int argc, char **argv) 
@@ -164,10 +185,11 @@ int main(int argc, char **argv)
 				responseFromServer = getUDPMessageFromServer(receivedMessage, socketConn);
 				printf("%s",responseFromServer);
 
+				receiveFile(tcpPort,fileName,getFileSize(responseFromServer));
+
 				// clear char array to have a clean start for next message.
 				memset(receivedMessage , 0 , sizeof(receivedMessage));
 
-				receiveFile(tcpPort,fileName);
 				break;
 		}
 

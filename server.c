@@ -29,7 +29,7 @@ void sendFileOverTCP(char* ipString, char *tcpPort, char* fileContents)
 
 	connect(socketConn,(struct sockaddr *)&servaddr,sizeof(servaddr));
 
-	write(socketConn,fileContents,strlen(fileContents)+1);
+	write(socketConn,fileContents,strlen(fileContents));
 	printf("File content sent to client: %s", fileContents);
 	
 	// char* ipString = inet_ntoa(servaddr->sin_addr);
