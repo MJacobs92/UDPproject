@@ -38,7 +38,8 @@ int main(int argc, char **argv)
 
 	char *token;
 	int count = 0;
-	char *message = malloc(1);
+	// char *message = malloc(1);
+	char message[1024];
 
 	while(1){
 
@@ -70,19 +71,13 @@ int main(int argc, char **argv)
 					printf("Message SENT to client: %s\n", token);
 
 					//construct message to send back to the client
-					message = malloc(strlen(token)+5);
-					strcpy(message, token);
-					strcat(message, "\n");
+					sprintf(message, "%s\n", token);
 
 					//send message to the client
 					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
 
 					// reset msg char array
-					memset( message , 0 , sizeof( &message ) ) ;
-
-					//deallocate memory
-					free(message);
-
+					memset(message,0,sizeof(&message));
 				}
 
 				token = strtok(NULL, "\n");
@@ -95,29 +90,44 @@ int main(int argc, char **argv)
 			{
 				if(count == 1)
 				{
-					FILE *fp;
-					fp = fopen(token,"r");
+					FILE *filePointer;
 
-					if( fp == NULL )
+					// attempt to open file
+					filePointer = fopen(token,"r");
+
+					if( filePointer == NULL )
 					{
 						printf("File: %s was not found\n", token);
 
-					//construct message to send back to the client
-						char *message = malloc(strlen("NOT FOUND")+5);
-						strcpy(message, "NOT FOUND");
-						strcat(message, "\n");
+						//construct message to send back to the client
+						sprintf(message, "NOT FOUND\n");
 
-					//send message to the client
+						//send message to the client
 						sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
 						printf("Message SENT to client: %s\n", message);
 
-					// reset msg char array
-						memset( message , 0 , sizeof( &message ) ) ;
-
-					//deallocate memory
-						free(message);
+						// reset msg char array
+						memset(message,0,sizeof(&message));
+						
+						break;
 
 					}
+					//find end of file
+					fseek(filePointer,0L,SEEK_END);
+					//count bytes in file
+					long fileSize = ftell(filePointer);
+					printf("file size: %zu\n", fileSize );
+
+					//construct message to send back to the client
+					sprintf(message, "OK\n%ld\n", fileSize);
+					
+					//send message to the client
+					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+
+					// reset msg char array
+					memset(message,0,sizeof(&message));
+
+					fclose(filePointer);
 
 				}
 				else if(count == 2)

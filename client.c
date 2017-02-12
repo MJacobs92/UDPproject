@@ -5,31 +5,16 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-char* constructMessageForCap(char *messageString)
+void constructMessageForCap(char message[], char *messageString)
 {
-	// create a string that is big enough to hold the message to send to the server 
-	char *message = malloc(strlen(messageString)+5);
-
-    // create the string to send the server.
-	strcpy(message, "CAP\n");
-	strcat(message, messageString);
-	strcat(message, "\n");
-	return message;
+	memset(message , 0 , sizeof(&message));
+	sprintf(message, "CAP\n%s\n", messageString);
 }
 
-char* constructMessageForReceiveFile(char *messageString, char *tcpPort)
+void constructMessageForReceiveFile(char message[], char *messageString, char *tcpPort)
 {
-	// create a string that is big enough to hold the message to send to the server 
-	char *message = malloc(strlen(messageString)+11);
-
-    // create the string to send the server.
-	strcpy(message, "FILE\n");
-	strcat(message, messageString);
-	strcat(message, "\n");
-	strcat(message, tcpPort);
-	strcat(message, "\n");
-
-	return message;
+	memset(message , 0 , sizeof(&message));
+	sprintf(message, "FILE\n%s\n%s\n", messageString,tcpPort);
 }
 
 char* getUDPMessageFromServer(char *receivedMessage, int socketConn)
@@ -40,7 +25,7 @@ char* getUDPMessageFromServer(char *receivedMessage, int socketConn)
 		recvfrom(socketConn,receivedMessage,1024,0,NULL, NULL);
 		if(strcmp(receivedMessage,"") != 0)
 		{
-			printf("Message from server: %s",receivedMessage);
+			// printf("Message from server: %s",receivedMessage);
 			break;
 		}					
 	}
@@ -87,7 +72,7 @@ int main(int argc, char **argv)
 	//create socket to listen for connections. 
 	socketConn = socket(AF_INET, SOCK_DGRAM, 0);
 
-	char* message;
+	char message[1024];
 	char* responseFromServer;
 
 	char receivedMessage[1024];
@@ -109,7 +94,7 @@ int main(int argc, char **argv)
 				fgets(userString,1024,stdin);
 
 				// create message to send to server
-				message = constructMessageForCap(userString);
+				constructMessageForCap(message,userString);
 
 				//send message to server
 				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);		
@@ -128,7 +113,7 @@ int main(int argc, char **argv)
 				fgets(fileName,1024,stdin);
 
 				// create message to send to server
-				message = constructMessageForReceiveFile(fileName,tcpPort);
+				constructMessageForReceiveFile(message, fileName,tcpPort);
 
 				//send message to server
 				sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&servaddr,sendsize);
