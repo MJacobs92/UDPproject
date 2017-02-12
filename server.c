@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 
 	char *token;
 	int count = 0;
+	char *message = malloc(1);
 
 	while(1){
 
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 
 
     	// get the first token which should be the action to perform (ie CAP or FILE)
-		token = strtok(messageBuffer, "\n");		
+		token = strtok(messageBuffer, "\n");
 
 		if(strcmp(token,"CAP") == 0)
 		{
@@ -68,11 +69,19 @@ int main(int argc, char **argv)
 					}
 					printf("Message SENT to client: %s\n", token);
 
-					char *message = malloc(strlen(token)+5);
+					//construct message to send back to the client
+					message = malloc(strlen(token)+5);
 					strcpy(message, token);
 					strcat(message, "\n");
 
+					//send message to the client
 					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+
+					// reset msg char array
+					memset( message , 0 , sizeof( &message ) ) ;
+
+					//deallocate memory
+					free(message);
 
 				}
 
@@ -93,11 +102,20 @@ int main(int argc, char **argv)
 					{
 						printf("File: %s was not found\n", token);
 
-					char *message = malloc(strlen("NOT FOUND")+5);
-					strcpy(message, "NOT FOUND");
-					strcat(message, "\n");
+					//construct message to send back to the client
+						char *message = malloc(strlen("NOT FOUND")+5);
+						strcpy(message, "NOT FOUND");
+						strcat(message, "\n");
 
-					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+					//send message to the client
+						sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
+						printf("Message SENT to client: %s\n", message);
+
+					// reset msg char array
+						memset( message , 0 , sizeof( &message ) ) ;
+
+					//deallocate memory
+						free(message);
 
 					}
 
@@ -116,6 +134,7 @@ int main(int argc, char **argv)
 			printf("Bad Content\n");
 		}
 
+		count = 0;
 
 	}
 
