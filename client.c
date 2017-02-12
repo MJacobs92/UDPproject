@@ -34,6 +34,38 @@ char* getUDPMessageFromServer(char *receivedMessage, int socketConn)
 
 }
 
+void receiveFile(char * tcpPort, char* fileName)
+{
+	int socketConn;
+	int acceptedConnection;
+	struct sockaddr_in servaddr;
+
+	char fileContents[1024];
+
+	socketConn = socket(AF_INET, SOCK_STREAM, 0);
+
+	bzero( &servaddr, sizeof(servaddr));
+
+	servaddr.sin_family = AF_INET;
+    servaddr.sin_addr.s_addr = htons(INADDR_ANY);
+    servaddr.sin_port = htons(atoi(tcpPort));
+
+    bind(socketConn, (struct sockaddr *) &servaddr, sizeof(servaddr));
+
+    listen(socketConn, 10);
+
+    acceptedConnection = accept(socketConn, (struct sockaddr*) NULL, NULL);
+
+    bzero(fileContents, sizeof(fileContents));
+
+    read(acceptedConnection,fileContents,sizeof(fileContents));
+
+    FILE *file = fopen(fileName, "wb");
+	fwrite(fileContents, sizeof(char), sizeof(fileContents), file);
+	fclose(file);
+
+}
+
 int main(int argc, char **argv) 
 {
 	// read tcp port from command  line and store
@@ -124,6 +156,8 @@ int main(int argc, char **argv)
 
 				// clear char array to have a clean start for next message.
 				memset(receivedMessage , 0 , sizeof(receivedMessage));
+
+				receiveFile(tcpPort,fileName);
 				break;
 		}
 

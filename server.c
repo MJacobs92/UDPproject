@@ -6,6 +6,46 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <ctype.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+
+void sendFileOverTCP(struct sockaddr_storage sender, char *tcpPort, char* fileContents)
+{
+	int socketConn;
+	struct sockaddr_in *servaddr;
+	// char buffer[1024];
+
+	bzero(&servaddr,sizeof(servaddr));
+	servaddr = (struct sockaddr_in*)&sender;
+
+	servaddr.sin_port = htons(atoi(tcpPort));
+
+	//create socket to listen for connections. 
+	socketConn = socket(AF_INET, SOCK_STREAM, 0);
+
+	connect(socketConn,(struct sockaddr *)&servaddr,sizeof(servaddr));
+
+	write(socketConn,fileContents,strlen(fileContents)+1);
+	printf("File content sent to client: %s", fileContents);
+	
+
+
+	// inet_ntop(AF_INET,&servaddr,buffer,sizeof(buffer));
+
+	// printf("made it to the function\n");
+	// // printf("****** trying to extract ip: %u\n", servaddr.sin_addr.s_addr);
+	// printf("****** trying to extract ip: %s\n", buffer);
+
+
+
+	// socklen_t peer_addrlen;
+	// char host[NI_MAXHOST];
+
+	// getnameinfo((struct sockaddr *)&sender, sizeof(sender), host, sizeof(host), NULL, 0, NI_NUMERICHOST);
+
+	// printf("******source ip of client! %s\n", host);
+
+}
 
 int main(int argc, char **argv) 
 {
@@ -40,6 +80,9 @@ int main(int argc, char **argv)
 	int count = 0;
 	// char *message = malloc(1);
 	char message[1024];
+
+	char fileContents[1024];
+	long fileSize;
 
 	while(1){
 
@@ -115,12 +158,17 @@ int main(int argc, char **argv)
 					//find end of file
 					fseek(filePointer,0L,SEEK_END);
 					//count bytes in file
-					long fileSize = ftell(filePointer);
+					fileSize = ftell(filePointer);
 					printf("file size: %zu\n", fileSize );
 
 					//construct message to send back to the client
 					sprintf(message, "OK\n%ld\n", fileSize);
 					
+					rewind(filePointer);
+
+					memset(fileContents,0,sizeof(&fileContents));
+					fread(fileContents, fileSize,1, filePointer);
+
 					//send message to the client
 					sendto(socketConn,message,strlen(message),0,(struct sockaddr *)&sender,sendsize);
 
@@ -132,7 +180,8 @@ int main(int argc, char **argv)
 				}
 				else if(count == 2)
 				{
-					printf("Shouldnt be in here at the moment.\n");
+					printf("Made it to count 2.\n");
+					sendFileOverTCP(sender,token,fileContents);
 				}
 
 				token = strtok(NULL, "\n");
