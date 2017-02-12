@@ -12,13 +12,13 @@
 void sendFileOverTCP(struct sockaddr_storage sender, char *tcpPort, char* fileContents)
 {
 	int socketConn;
-	struct sockaddr_in *servaddr;
+	struct sockaddr_in* servaddr;
 	// char buffer[1024];
 
 	bzero(&servaddr,sizeof(servaddr));
 	servaddr = (struct sockaddr_in*)&sender;
 
-	servaddr.sin_port = htons(atoi(tcpPort));
+	servaddr->sin_port = htons(atoi(tcpPort));
 
 	//create socket to listen for connections. 
 	socketConn = socket(AF_INET, SOCK_STREAM, 0);
